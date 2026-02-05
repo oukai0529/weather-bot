@@ -1,0 +1,33 @@
+name: 每日天气推送
+
+on:
+  schedule:
+    # 北京时间 07:00 = UTC时间 23:00 (前一天)
+    - cron: '0 23 * * *'
+  
+  # 允许手动触发测试
+  workflow_dispatch:
+
+jobs:
+  send-weather:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 拉取代码
+        uses: actions/checkout@v3
+      
+      - name: 🐍 设置 Python 环境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: 📦 安装依赖库
+        run: |
+          pip install requests
+          
+      - name: 🚀 运行天气脚本
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          QWEATHER_KEY: ${{ secrets.QWEATHER_KEY }}
+        run: python weather_bot.py
